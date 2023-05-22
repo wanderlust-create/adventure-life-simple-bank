@@ -12,7 +12,10 @@ WHERE id = $1 LIMIT 1;
 
 -- name: ListTransfers :many
 SELECT * FROM transfers
-ORDER BY id DESC
-LIMIT $1
-OFFSET $2;
+WHERE 
+    from_account_id = $1 OR
+    to_account_id = $2
+ORDER BY id
+LIMIT $3
+OFFSET $4;
 
