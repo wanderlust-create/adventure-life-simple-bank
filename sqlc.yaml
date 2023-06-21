@@ -8,8 +8,7 @@ sql:
         package: "simple_bank_db"
         out: "db/simple_bank_db"
         emit_prepared_queries: false
-        emit_json_tags  : true
+        emit_json_tags: true
         emit_interface: false
         emit_exact_table_names: false
-       
-        
+        emit_empty_slices: true
