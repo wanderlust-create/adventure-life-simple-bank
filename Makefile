@@ -25,4 +25,7 @@ test:
 server:
 	go run main.go
 
-.PHONY: postgres start createdb dropdb migrateup migratedown sqlc test server 
+mock: 
+	mockgen -package mockdb -destination db/mock/store.go github.com/wanderlust-create/adventure-life-simple-bank/db/simple_bank_db Store
+
+.PHONY: postgres start createdb dropdb migrateup migratedown sqlc test server mock

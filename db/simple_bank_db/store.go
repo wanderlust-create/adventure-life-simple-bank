@@ -11,21 +11,27 @@ import (
 // Querry struct can only execute 1 operation at a time so this will expad it's functionality
 // is called a Composition: the preferred way to extend struct functionality instead of inheritance
 // embedding Queries inside of Store
-type Store struct {
-	*Queries
+type Store interface {
+	Querier
+	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
+}
+
+// provides all functions to execute SQL queries and transactions
+type SQLStore struct {
 	db *sql.DB // this is required to create a new DB transaction
+	*Queries
 }
 
 // function to create a new Store Object
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		Queries: New(db),
 		db:      db,
 	}
 }
 
 // executes a function within a db transaction
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -60,7 +66,7 @@ type TransferTxResult struct {
 // performes a money transfer from one account to the other.
 // It creates a tfr record, adds acct entries, and updates account balances within a single transaction
 // uses a Closure: used when we want to get the result from a callback function: result.Transfer: the callback function itself does not know the exact type result it shoud return
-func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
