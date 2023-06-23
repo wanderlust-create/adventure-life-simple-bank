@@ -36,9 +36,11 @@ jobs:
           which migrate
       - name: Run migrations
         run: make migrateup
+      - name: Create env file
+        run: |
+          touch app.env
+          echo DB_DRIVER=${{secrets.DB_DRIVER}}
+          echo DB_SOURCE=${{secrets.DB_SOURCE}}
+          echo SERVER_ADDRESS=${{secrets.SERVER_ADDRESS}}
       - name: Test
-        env:
-          DB_DRIVER: ${{secrets.DB_DRIVER}}
-          DB_SOURCE: ${{secrets.DB_SOURCE}}
-          SERVER_ADDRESS: ${{secrets.SERVER_ADDRESS}}
         run: make test
