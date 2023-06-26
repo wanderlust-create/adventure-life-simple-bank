@@ -156,6 +156,22 @@ func TestCreateAccountAPI(t *testing.T) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
+		{
+			name: "BadRequest",
+			body: gin.H{
+				"owner":    account.Owner,
+				"currency": "invalid",
+				"balance":  account.Balance,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreateAccount(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
 	}
 	for i := range testCases {
 		tc := testCases[i]
@@ -181,7 +197,6 @@ func TestCreateAccountAPI(t *testing.T) {
 			tc.checkResponse(t, recorder)
 		})
 	}
-
 }
 
 func randomAccount(userName string) db.Account {
